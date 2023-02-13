@@ -31,11 +31,18 @@ GetOptions ("aggressive=s" => \$split_aggr,
 ##   this is a bit experimental though ...                           ##
 #######################################################################
 
-### CHANGE YOUR PATH HERE ####################################
 
-my $folder = "ToyData";
-my $in_all_freq = "$folder/all_pos_freq.txt";
-my $in_all_lem = "$folder/all_pos_lem.txt";
+my ($in_words_to_split, $in_all_freq, $in_all_lem) = @ARGV;
+
+if (not defined $in_words_to_split) {
+  die "Need input file with words to split (1st arg)\n";
+}
+if (not defined $in_all_freq) {
+  die "Need input resource file all_pos_freq.txt\n";
+}
+if (not defined $in_all_lem) {
+  die "need input resource file all_pos_lem.txt\n";
+}
 
 ### MAYBE CHANGE THRESHOLDS ##################################
 
@@ -116,7 +123,8 @@ my %poss;
 my %modified;  ## keeps track whether a splitting was obtained based on modifications 
                ## (removing/adding a fugenelement) -> to be disfavoured in case of equal score
 
-while(<>) {
+open(IN_WORDS, $in_words_to_split) or die "cannot open $in_words_to_split\n";                      
+while(<IN_WORDS>) {
     chomp;
     (my $word_to_split, my $cat_pos, my $rest) = split(/\t/);
    
@@ -357,8 +365,9 @@ while(<>) {
 
     for (keys %poss) { delete $poss{$_} };
     for (keys %modified) { delete $modified{$_} };
-}
 
+}
+close(IN_WORDS);
 #------------------------------------------------------------------------------------
 
 sub split_into_two_parts ($) {
